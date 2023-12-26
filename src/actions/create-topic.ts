@@ -69,6 +69,6 @@ export async function createTopic(
       };
     }
   }
-  revalidatePath("/");
-  redirect(paths.topicShow(topic.slug));
+  revalidatePath("/"); //learn
+  redirect(paths.topicShow(topic.slug)); //learn
 }
