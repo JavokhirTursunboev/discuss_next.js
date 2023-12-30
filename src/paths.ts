@@ -1,6 +1,6 @@
 const paths = {
   home() {
-    return "/";
+    return '/';
   },
   topicShow(topicSlug: string) {
     return `/topics/${topicSlug}`;

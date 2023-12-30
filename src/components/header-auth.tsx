@@ -1,26 +1,37 @@
-"use client";
-import { signIn, signOut } from "@/actions";
-import { Avatar, NavbarItem, Button, Popover, PopoverTrigger, PopoverContent } from "@nextui-org/react";
-import { useSession } from "next-auth/react";
+'use client';
+
+import Link from 'next/link';
+import {
+  Navbar,
+  NavbarBrand,
+  NavbarContent,
+  NavbarItem,
+  Input,
+  Button,
+  Avatar,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from '@nextui-org/react';
+import { useSession } from 'next-auth/react';
+import * as actions from '@/actions';
 
 export default function HeaderAuth() {
   const session = useSession();
 
   let authContent: React.ReactNode;
-
-  if (session.status === "loading") {
+  if (session.status === 'loading') {
     authContent = null;
   } else if (session.data?.user) {
     authContent = (
       <Popover placement="left">
         <PopoverTrigger>
-          <Avatar src={session.data.user.image || ""} />
+          <Avatar src={session.data.user.image || ''} />
         </PopoverTrigger>
-
         <PopoverContent>
-          <div>
-            <form action={signOut}>
-              <Button type="submit"> Sign Out</Button>
+          <div className="p-4">
+            <form action={actions.signOut}>
+              <Button type="submit">Sign Out</Button>
             </form>
           </div>
         </PopoverContent>
@@ -29,25 +40,24 @@ export default function HeaderAuth() {
   } else {
     authContent = (
       <>
-        <form action={signIn}>
-          <NavbarItem>
+        <NavbarItem>
+          <form action={actions.signIn}>
             <Button type="submit" color="secondary" variant="bordered">
-              {" "}
               Sign In
             </Button>
-          </NavbarItem>
-        </form>
+          </form>
+        </NavbarItem>
 
-        <form action={signOut}>
-          <NavbarItem>
+        <NavbarItem>
+          <form action={actions.signIn}>
             <Button type="submit" color="primary" variant="flat">
-              {" "}
-              Sign Out
+              Sign Up
             </Button>
-          </NavbarItem>
-        </form>
+          </form>
+        </NavbarItem>
       </>
     );
   }
+
   return authContent;
 }

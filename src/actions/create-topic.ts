@@ -1,37 +1,38 @@
-"use server";
+'use server';
 
-import { auth } from "@/auth";
-import { db } from "@/db";
-import { Topic } from "@prisma/client";
-import { revalidatePath } from "next/cache";
-import { z } from "zod";
-import paths from "@/path";
-import { redirect } from "next/navigation";
+import type { Topic } from '@prisma/client';
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+import { z } from 'zod';
+import { auth } from '@/auth';
+import { db } from '@/db';
+import paths from '@/paths';
 
-const createTopicScheme = z.object({
+const createTopicSchema = z.object({
   name: z
     .string()
     .min(3)
     .regex(/[a-z-]/, {
-      message: "Must be lowercase letters or dashes without spaces",
+      message: 'Must be lowercase letters or dashes without spaces',
     }),
   description: z.string().min(10),
 });
 
-interface CreateTopicFromState {
+interface CreateTopicFormState {
   errors: {
     name?: string[];
     description?: string[];
     _form?: string[];
   };
 }
+
 export async function createTopic(
-  formState: CreateTopicFromState,
+  formState: CreateTopicFormState,
   formData: FormData
-): Promise<CreateTopicFromState> {
-  const result = createTopicScheme.safeParse({
-    name: formData.get("name"),
-    description: formData.get("description"),
+): Promise<CreateTopicFormState> {
+  const result = createTopicSchema.safeParse({
+    name: formData.get('name'),
+    description: formData.get('description'),
   });
 
   if (!result.success) {
@@ -39,15 +40,17 @@ export async function createTopic(
       errors: result.error.flatten().fieldErrors,
     };
   }
+
   const session = await auth();
   if (!session || !session.user) {
     return {
       errors: {
-        _form: ["You must be SIGN IN to do this"],
+        _form: ['You must be signed in to do this.'],
       },
     };
   }
-  let topic: Topic; //learn
+
+  let topic: Topic;
   try {
     topic = await db.topic.create({
       data: {
@@ -65,11 +68,12 @@ export async function createTopic(
     } else {
       return {
         errors: {
-          _form: ["something went wrong"],
+          _form: ['Something went wrong'],
         },
       };
     }
   }
-  revalidatePath("/"); //learn
-  redirect(paths.topicShow(topic.slug)); //learn
+
+  revalidatePath('/');
+  redirect(paths.topicShow(topic.slug));
 }
